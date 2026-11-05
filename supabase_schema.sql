@@ -20,9 +20,17 @@ create table if not exists app_candidatures (
     primary key (email, cle)
 );
 
+-- Clés API : on ne stocke que le hash SHA-256 de la clé (jamais la clé en clair)
+create table if not exists app_api_keys (
+    key_hash text primary key,
+    email    text not null
+);
+create index if not exists app_api_keys_email_idx on app_api_keys (email);
+
 alter table app_users        enable row level security;
 alter table app_comments     enable row level security;
 alter table app_candidatures enable row level security;
+alter table app_api_keys     enable row level security;
 
 -- Bucket PRIVÉ pour les photos de carte nationale et les selfies
 insert into storage.buckets (id, name, public)
