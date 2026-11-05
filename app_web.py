@@ -210,7 +210,7 @@ def charger_offres_df():
         return pd.DataFrame()
     df = pd.read_csv(F_OFFRES)
     df["ville"] = df["ville"].fillna("Non précisé")
-    df["entreprise"] = df["entreprise"].fillna("")
+    df["entreprise"] = df["entreprise"].astype(object).fillna("")
     df["description"] = df["description"].fillna("Description non disponible.")
     return df
 
@@ -989,16 +989,35 @@ def toggle():
 
 # ----------------------------------------------------------- dashboard ----
 
+# GRAPHES_OFFRES = {
+#     "bar_villes": graphes.fig_bar_villes,
+#     "pie_sources": graphes.fig_pie_sources,
+#     "hist_longueur": graphes.fig_hist_longueur,
+#     "boxplot_longueur": graphes.fig_boxplot_longueur,
+#     "heatmap_ville_source": graphes.fig_heatmap_ville_source,
+#     "scatter_villes": graphes.fig_scatter_villes,
+# }
+# GRAPHES_ENTREPRISES = {"bar_categories_entreprises": graphes.fig_bar_categories_entreprises}
+
 GRAPHES_OFFRES = {
     "bar_villes": graphes.fig_bar_villes,
     "pie_sources": graphes.fig_pie_sources,
     "hist_longueur": graphes.fig_hist_longueur,
+    "hist_anciennete": graphes.fig_hist_anciennete,
     "boxplot_longueur": graphes.fig_boxplot_longueur,
     "heatmap_ville_source": graphes.fig_heatmap_ville_source,
-    "scatter_villes": graphes.fig_scatter_villes,
+    "timeline_offres": graphes.fig_timeline_offres,
+    "bar_mots_cles": graphes.fig_bar_mots_cles,
+    "bubble_ville_motcle": graphes.fig_bubble_ville_motcle,
+    "bubble_carte_villes": graphes.fig_bubble_carte_villes,
+    "scatter_anciennete_longueur": graphes.fig_scatter_anciennete_longueur,
 }
-GRAPHES_ENTREPRISES = {"bar_categories_entreprises": graphes.fig_bar_categories_entreprises}
-
+GRAPHES_ENTREPRISES = {
+    "bar_categories_entreprises": graphes.fig_bar_categories_entreprises,
+    "hist_notes": graphes.fig_hist_notes,
+    "scatter_note_avis": graphes.fig_scatter_note_avis,
+    "bubble_categories": graphes.fig_bubble_categories,
+}
 
 @app.route("/dashboard")
 def page_dashboard():
