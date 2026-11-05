@@ -13,18 +13,6 @@
     </div>
 </div>
 
-<section class="panel completion" id="completion">
-    <header><span class="step"><i class="fa-solid fa-chart-line"></i></span><h2>{{ t('completion_title') }}</h2><b class="completion-pct">{{ completion.pct }} %</b></header>
-    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ completion.pct }}"><span style="width: {{ completion.pct }}%"></span></div>
-    {% if completion.missing %}
-        <p class="hint">{{ t('completion_lead', pct=completion.pct, rest=completion.remaining) }}</p>
-        <p class="hint">{{ t('completion_missing') }}
-            {% for key, anchor in completion.missing %}<a class="tag tag-link" href="#{{ anchor }}">{{ t('pc_' ~ key) }}</a>{% endfor %}</p>
-    {% else %}
-        <p class="ok-text"><i class="fa-solid fa-circle-check"></i> {{ t('completion_done') }}</p>
-    {% endif %}
-</section>
-
 <div class="profile-grid">
     <section class="panel" id="email">
         <header><span class="step {{ 'step-done' if me.email_verified }}">{% if me.email_verified %}<i class="fa-solid fa-check"></i>{% else %}1{% endif %}</span><h2>{{ t('step_email') }}</h2></header>
@@ -90,37 +78,65 @@
                 <label>{{ t('f_city') }}<input name="city" value="{{ me.profile.get('city','') }}" maxlength="60"></label>
                 <label>{{ t('f_status') }}<input name="formation" value="{{ me.profile.get('formation','') }}" maxlength="200" placeholder="{{ t('ph_status') }}"></label>
             </div>
-            <div class="form-row">
-                <label>{{ t('f_tech_skills') }}<input name="tech_skills" id="tech_skills" value="{{ me.profile.get('tech_skills', [])|join(', ') }}" maxlength="600" placeholder="{{ t('ph_tech_skills') }}">
-                    <span class="chips" data-target="tech_skills">{% for s in ['Python','SQL','Power BI','Pandas','Machine Learning','Excel','Git','Flask'] %}<button type="button" class="chip">{{ s }}</button>{% endfor %}</span></label>
-                <label>{{ t('f_soft_skills') }}<input name="soft_skills" id="soft_skills" value="{{ me.profile.get('soft_skills', [])|join(', ') }}" maxlength="600" placeholder="{{ t('ph_soft_skills') }}">
-                    <span class="chips" data-target="soft_skills">{% for s in ['Travail en équipe','Communication','Autonomie','Esprit d\'analyse','Gestion du temps','Adaptabilité'] %}<button type="button" class="chip">{{ s }}</button>{% endfor %}</span></label>
-            </div>
-            <p class="hint">{{ t('skills_hint') }}</p>
-            <div class="form-row">
-                <label>{{ t('f_goal') }}<select name="goal">
-                    <option value="">{{ t('goal_choose') }}</option>
-                    <option value="stage" {{ 'selected' if me.profile.get('goal') == 'stage' }}>{{ t('goal_stage') }}</option>
-                    <option value="emploi" {{ 'selected' if me.profile.get('goal') == 'emploi' }}>{{ t('goal_emploi') }}</option>
-                </select></label>
-            </div>
             <button class="btn btn-primary"><i class="fa-regular fa-floppy-disk"></i> {{ t('save') }}</button>
         </form>
+    </section>
+
+    <section class="panel panel-wide" id="api">
+        <header><span class="step"><i class="fa-solid fa-key"></i></span><h2>{{ t('api_title') }}</h2></header>
+        <p class="hint">{{ t('api_hint') }}</p>
+        {% if new_api_key %}
+            <div class="flash flash-success"><i class="fa-solid fa-triangle-exclamation"></i> {{ t('api_once') }}</div>
+            <div class="api-key-box" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+                <code id="api-key-value" dir="ltr" style="flex:1;min-width:0;overflow-wrap:anywhere;padding:.6rem .8rem;border:1px solid var(--border,#ddd);border-radius:8px">{{ new_api_key }}</code>
+                <button type="button" class="btn btn-outline btn-sm" id="api-copy" data-ok="{{ t('api_copied') }}"><i class="fa-regular fa-copy"></i> {{ t('api_copy') }}</button>
+            </div>
+            <p class="hint"><i class="fa-solid fa-lock"></i> {{ t('api_secret') }}</p>
+        {% elif me.api_key.get('prefix') %}
+            <p class="ok-text"><i class="fa-solid fa-circle-check"></i> {{ t('api_active') }} :
+                <code dir="ltr">{{ me.api_key.get('prefix') }}…</code>
+                · {{ t('api_created') }} {{ (me.api_key.get('created') or '')[:10] }}</p>
+        {% endif %}
+
+        {% if not me.email_verified %}
+            <p class="hint locked"><i class="fa-solid fa-lock"></i> {{ t('api_need_email') }}</p>
+        {% endif %}
+        <div class="actions" style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <form method="post" action="{{ url_for('profil_api_key_generer') }}"
+                  {% if me.api_key.get('prefix') %}onsubmit="return confirm('{{ t('api_regenerate_confirm')|e }}')"{% endif %}>{{ csrf_input() }}
+                <button class="btn btn-primary" {{ 'disabled' if not me.email_verified }}><i class="fa-solid fa-key"></i>
+                    {{ t('api_regenerate') if me.api_key.get('prefix') else t('api_generate') }}</button>
+            </form>
+            {% if me.api_key.get('prefix') %}
+            <form method="post" action="{{ url_for('profil_api_key_revoquer') }}" onsubmit="return confirm('{{ t('api_revoke_confirm')|e }}')">{{ csrf_input() }}
+                <button class="btn btn-ghost danger-link"><i class="fa-regular fa-trash-can"></i> {{ t('api_revoke') }}</button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if me.api_key.get('prefix') or new_api_key %}
+        <h3 style="margin-top:1.2rem">{{ t('api_usage') }}</h3>
+        <pre dir="ltr" style="overflow-x:auto;padding:.8rem;border:1px solid var(--border,#ddd);border-radius:8px">curl -H "X-API-Key: VOTRE_CLE" \
+  "{{ url_for('api_offres', _external=True) }}?q=data&amp;ville=Marrakech&amp;per_page=10"</pre>
+        <p class="hint">{{ t('api_params') }}</p>
+        {% endif %}
     </section>
 </div>
 
 <script>
 (function () {
-    // suggestions de compétences : un clic ajoute l'élément au champ
-    document.querySelectorAll('.chips').forEach(function (box) {
-        var input = document.getElementById(box.dataset.target);
-        box.addEventListener('click', function (e) {
-            var b = e.target.closest('.chip'); if (!b) return;
-            var items = input.value.split(/[,;]+/).map(function (x) { return x.trim(); }).filter(Boolean);
-            if (!items.some(function (x) { return x.toLowerCase() === b.textContent.toLowerCase(); })) items.push(b.textContent);
-            input.value = items.join(', ');
+    var cp = document.getElementById('api-copy');
+    if (cp) cp.addEventListener('click', function () {
+        var v = document.getElementById('api-key-value').textContent.trim();
+        (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(function () {
+            cp.textContent = cp.dataset.ok;
+        }).catch(function () {
+            var r = document.createRange(); r.selectNode(document.getElementById('api-key-value'));
+            var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
         });
     });
+})();
+(function () {
     // Compression des photos dans le navigateur avant l'envoi (limite de 4,5 Mo par requête sur Vercel)
     var form = document.querySelector('form.upload-form');
     if (form && window.createImageBitmap) {
