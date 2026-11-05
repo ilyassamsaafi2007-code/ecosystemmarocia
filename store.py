@@ -27,6 +27,7 @@ class LocalStore:
         self.users_f = self.base / "users.json"
         self.comments_f = self.base / "commentaires.json"
         self.cands_f = self.base / "candidatures.json"
+        self.apikeys_f = self.base / "api_keys.json"
         self.kyc_dir = self.base / "kyc"
 
     # -- helpers
@@ -83,6 +84,20 @@ class LocalStore:
         else:
             mine[cle] = True
         self._write(self.cands_f, data)
+
+    # -- clés API : {hash_sha256: email}  (la clé en clair n'est jamais stockée)
+    def apikey_put(self, key_hash, email):
+        data = self._read(self.apikeys_f)
+        data[key_hash] = email
+        self._write(self.apikeys_f, data)
+
+    def apikey_get(self, key_hash):
+        return self._read(self.apikeys_f).get(key_hash)
+
+    def apikey_delete(self, key_hash):
+        data = self._read(self.apikeys_f)
+        if data.pop(key_hash, None) is not None:
+            self._write(self.apikeys_f, data)
 
     # -- photos d'identité
     def kyc_put(self, uid, kind, data):
@@ -174,6 +189,18 @@ class SupabaseStore:
         else:
             self._rest("POST", "app_candidatures", body={"email": email, "cle": cle},
                        prefer="resolution=merge-duplicates,return=minimal")
+
+    # -- clés API (table app_api_keys : key_hash -> email)
+    def apikey_put(self, key_hash, email):
+        self._rest("POST", "app_api_keys", {"on_conflict": "key_hash"}, {"key_hash": key_hash, "email": email},
+                   prefer="resolution=merge-duplicates,return=minimal")
+
+    def apikey_get(self, key_hash):
+        rows = self._rest("GET", "app_api_keys", {"key_hash": f"eq.{key_hash}", "select": "email"}).json()
+        return rows[0]["email"] if rows else None
+
+    def apikey_delete(self, key_hash):
+        self._rest("DELETE", "app_api_keys", {"key_hash": f"eq.{key_hash}"}, prefer="return=minimal")
 
     # -- photos d'identité (bucket privé)
     def _obj(self, uid, kind):
