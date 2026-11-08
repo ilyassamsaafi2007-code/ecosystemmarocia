@@ -21,6 +21,7 @@
         <a href="{{ url_for('page_cv') }}" class="{{ 'active' if request.endpoint == 'page_cv' }}"><i class="fa-regular fa-file-lines"></i><span>{{ t('nav_cv') }}</span></a>
         <a href="{{ url_for('evaluer_cv') }}" class="{{ 'active' if request.endpoint == 'evaluer_cv' }}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>{{ t('nav_eval') }}</span></a>
         <a href="{{ url_for('page_profil') }}" class="{{ 'active' if request.endpoint == 'page_profil' }}"><i class="fa-regular fa-id-card"></i><span>{{ t('nav_profile') }}</span>{% if not me.fully_verified %}<em class="nav-dot" title="{{ t('unverified_profile') }}"></em>{% endif %}</a>
+        <a href="{{ url_for('page_about') }}" class="{{ 'active' if request.endpoint == 'page_about' }}"><i class="fa-solid fa-circle-info"></i><span>{{ t('nav_about') }}</span></a>
         {% if is_admin %}<a href="{{ url_for('admin_verifications') }}" class="{{ 'active' if request.endpoint == 'admin_verifications' }}"><i class="fa-solid fa-user-shield"></i><span>{{ t('nav_admin') }}</span></a>{% endif %}
     </nav>
     <div class="sidebar-bottom">
