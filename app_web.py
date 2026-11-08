@@ -1018,6 +1018,9 @@ GRAPHES_ENTREPRISES = {
     "scatter_note_avis": graphes.fig_scatter_note_avis,
     "bubble_categories": graphes.fig_bubble_categories,
 }
+@app.route("/a-propos")
+def page_about():
+    return render_template("a_propos.html")
 
 @app.route("/dashboard")
 def page_dashboard():
