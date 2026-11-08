@@ -325,6 +325,20 @@ T = {
     "api_need_email": ("Vérifie d'abord ton email pour générer une clé API.", "Verify your email first to generate an API key.", "أكّد بريدك الإلكتروني أولاً لإنشاء مفتاح API."),
     "api_revoked": ("Clé API révoquée.", "API key revoked.", "تم إلغاء مفتاح API."),
 
+    # ---- à propos
+    "nav_about": ("À propos de nous", "About us", "من نحن"),
+    "about_eyebrow": ("À PROPOS", "ABOUT", "نبذة"),
+    "about_title": ("À propos de nous", "About us", "من نحن"),
+    "about_intro": ("Une plateforme pour aider les jeunes à trouver des offres d'emploi et des entreprises dans l'IA et la data au Maroc.",
+                    "A platform that helps young people find job offers and companies in AI and data in Morocco.",
+                    "منصة تساعد الشباب على إيجاد عروض الشغل والشركات في مجال الذكاء الاصطناعي والبيانات بالمغرب."),
+    "about_project_title": ("Le projet", "The project", "المشروع"),
+    "about_project_text": ("Projet réalisé à l'OFPPT Marrakech . Il regroupe les offres d'emploi, les entreprises IA de Marrakech, un tableau de bord, un générateur de CV et une API pour récupérer les offres.",
+                           "Project built at OFPPT Marrakech . It gathers job offers, AI companies in Marrakech, a dashboard, a CV builder and an API to fetch the offers.",
+                           "مشروع أُنجز في OFPPT مراكش . يجمع عروض الشغل وشركات الذكاء الاصطناعي بمراكش ولوحة قيادة ومُنشئ سيرة ذاتية وAPI لجلب العروض."),
+    "about_links_title": ("Retrouve-nous", "Find us online", "تابعنا"),
+    "about_portfolio": ("Portfolio", "Portfolio", "المعرض الشخصي"),
+
     # ---- admin
     "admin_eyebrow": ("ADMINISTRATION", "ADMINISTRATION", "الإدارة"),
     "admin_title": ("Vérification des profils", "Profile verification", "التحقق من الملفات الشخصية"),
