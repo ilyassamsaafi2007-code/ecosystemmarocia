@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ t('about_title') }}{% endblock %}
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">{{ t('about_eyebrow') }}</span>
+    <h1>{{ t('about_title') }}</h1>
+    <p class="lead">{{ t('about_intro') }}</p>
+</section>
+
+<section class="about-panel">
+    <h2>{{ t('about_project_title') }}</h2>
+    <p>{{ t('about_project_text') }}</p>
+</section>
+
+<section class="about-panel">
+    <h2>{{ t('about_links_title') }}</h2>
+    <div class="about-links">
+        <a class="about-link" href="https://github.com/ilyassamsaafi2007-code" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-github"></i>
+            <span><b>GitHub</b><small>github.com/ilyassamsaafi2007-code</small></span>
+            <i class="fa-solid fa-arrow-up-right-from-square about-out"></i>
+        </a>
+        <a class="about-link" href="https://ilyasseo.site.je/?i=1" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-globe"></i>
+            <span><b>{{ t('about_portfolio') }}</b><small>ilyasseo.site.je</small></span>
+            <i class="fa-solid fa-arrow-up-right-from-square about-out"></i>
+        </a>
+        <a class="about-link" href="https://www.linkedin.com/in/amssaafi-ilyasse-38b272385/" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-linkedin"></i>
+            <span><b>LinkedIn</b><small>linkedin.com/in/amssaafi-ilyasse-38b272385</small></span>
+            <i class="fa-solid fa-arrow-up-right-from-square about-out"></i>
+        </a>
+    </div>
+</section>
+{% endblock %}
