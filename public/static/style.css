@@ -302,17 +302,6 @@ a.card-title:hover { color: var(--primary); }
 [dir="rtl"] .chat-form button i { transform: none; }
 
 /* ------------------------------------------------------------ responsive ---- */
-/* complétion du profil + suggestions de compétences */
-.completion { margin-bottom: 20px; }
-.completion-pct { font-size: 1.4rem; color: var(--primary); }
-.progress { height: 12px; background: var(--primary-soft); border-radius: 999px; overflow: hidden; }
-.progress > span { display: block; height: 100%; background: linear-gradient(90deg, #2457e6, #5b8cff); border-radius: 999px; transition: width .4s; }
-.tag-link { text-decoration: none; margin: 4px 4px 0 0; }
-.tag-link:hover { background: var(--primary-soft); color: var(--primary); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { border: 1px solid var(--border); background: #f7f9fd; color: #475569; border-radius: 999px; padding: 3px 10px; font: inherit; font-size: .76rem; font-weight: 550; cursor: pointer; }
-.chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
-
 @media (max-width: 1000px) { .profile-grid { grid-template-columns: 1fr; } }
 @media (max-width: 900px) {
     :root { --sidebar-w: 78px; }
@@ -354,3 +343,16 @@ a.card-title:hover { color: var(--primary); }
 .comment-head { display: flex; gap: 10px; align-items: baseline; }
 .comment-head small { color: var(--muted); }
 .comment-body p { margin: 4px 0 0; white-space: pre-line; word-wrap: break-word; }
+
+
+/* ---- page À propos */
+.about-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow); }
+.about-panel h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--ink); }
+.about-panel p { margin: 0; color: var(--text); line-height: 1.6; }
+.about-links { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.about-link { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); text-decoration: none; color: var(--ink); background: #fff; transition: transform .12s, box-shadow .15s, border-color .15s; }
+.about-link:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+.about-link > i:first-child { font-size: 1.6rem; color: var(--primary); width: 28px; text-align: center; }
+.about-link span { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.about-link small { color: var(--muted); overflow-wrap: anywhere; }
+.about-out { color: var(--muted); font-size: .8rem; }
