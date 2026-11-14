@@ -27,6 +27,7 @@ class LocalStore:
         self.users_f = self.base / "users.json"
         self.comments_f = self.base / "commentaires.json"
         self.cands_f = self.base / "candidatures.json"
+        self.live_f = self.base / "offres_actuelles.json"
         self.apikeys_f = self.base / "api_keys.json"
         self.kyc_dir = self.base / "kyc"
 
@@ -98,6 +99,32 @@ class LocalStore:
         data = self._read(self.apikeys_f)
         if data.pop(key_hash, None) is not None:
             self._write(self.apikeys_f, data)
+
+    # -- offres actuelles : {"offres": {id: offre}, "last_refresh": iso}
+    def live_put_many(self, offres, fetched_at):
+        data = self._read(self.live_f) or {}
+        stock = data.get("offres", {})
+        for o in offres:
+            stock[o["id"]] = o
+        self._write(self.live_f, {"offres": stock, "last_refresh": fetched_at})
+
+    def live_all(self):
+        stock = (self._read(self.live_f) or {}).get("offres", {})
+        return sorted(stock.values(), key=lambda o: o.get("date_publication") or "", reverse=True)
+
+    def live_ids(self):
+        return set((self._read(self.live_f) or {}).get("offres", {}))
+
+    def live_last_refresh(self):
+        return (self._read(self.live_f) or {}).get("last_refresh")
+
+    def live_purge(self, avant_iso):
+        data = self._read(self.live_f) or {}
+        stock = data.get("offres", {})
+        garde = {k: o for k, o in stock.items() if (o.get("date_publication") or "9999") >= avant_iso}
+        if len(garde) != len(stock):
+            data["offres"] = garde
+            self._write(self.live_f, data)
 
     # -- photos d'identité
     def kyc_put(self, uid, kind, data):
@@ -201,6 +228,30 @@ class SupabaseStore:
 
     def apikey_delete(self, key_hash):
         self._rest("DELETE", "app_api_keys", {"key_hash": f"eq.{key_hash}"}, prefer="return=minimal")
+
+    # -- offres actuelles (table app_offres_live)
+    def live_put_many(self, offres, fetched_at):
+        rows = [{"offre_id": o["id"], "published": o.get("date_publication"), "fetched_at": fetched_at, "data": o}
+                for o in offres]
+        self._rest("POST", "app_offres_live", {"on_conflict": "offre_id"}, rows,
+                   prefer="resolution=merge-duplicates,return=minimal")
+
+    def live_all(self):
+        rows = self._rest("GET", "app_offres_live",
+                          {"select": "data", "order": "published.desc.nullslast", "limit": "1000"}).json()
+        return [r["data"] for r in rows]
+
+    def live_ids(self):
+        rows = self._rest("GET", "app_offres_live", {"select": "offre_id", "limit": "5000"}).json()
+        return {r["offre_id"] for r in rows}
+
+    def live_last_refresh(self):
+        rows = self._rest("GET", "app_offres_live",
+                          {"select": "fetched_at", "order": "fetched_at.desc", "limit": "1"}).json()
+        return rows[0]["fetched_at"] if rows else None
+
+    def live_purge(self, avant_iso):
+        self._rest("DELETE", "app_offres_live", {"published": f"lt.{avant_iso}"}, prefer="return=minimal")
 
     # -- photos d'identité (bucket privé)
     def _obj(self, uid, kind):
