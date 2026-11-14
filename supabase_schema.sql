@@ -25,6 +25,19 @@ create table if not exists app_api_keys (
     key_hash text primary key,
     email    text not null
 );
+
+create table if not exists app_offres_live (
+    offre_id   text primary key,
+    published  date,
+    fetched_at timestamptz not null default now(),
+    data       jsonb not null
+);
+create index if not exists app_offres_live_published_idx on app_offres_live (published desc);
+alter table app_offres_live enable row level security;
+
+notify pgrst, 'reload schema';
+
+
 create index if not exists app_api_keys_email_idx on app_api_keys (email);
 
 alter table app_users        enable row level security;
@@ -36,3 +49,13 @@ alter table app_api_keys     enable row level security;
 insert into storage.buckets (id, name, public)
 values ('kyc', 'kyc', false)
 on conflict (id) do update set public = false;
+
+-- Offres actuelles (page « Offres actuelles » : offres IT récupérées à la demande)
+create table if not exists app_offres_live (
+    offre_id   text primary key,
+    published  date,
+    fetched_at timestamptz not null default now(),
+    data       jsonb not null
+);
+create index if not exists app_offres_live_published_idx on app_offres_live (published desc);
+alter table app_offres_live  enable row level security;
