@@ -24,7 +24,7 @@ import os
 import re
 import secrets
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from functools import wraps
 from pathlib import Path
 from urllib.parse import quote, urlparse
@@ -42,6 +42,7 @@ from markupsafe import Markup
 import chatbot
 import graphes
 import i18n
+import live_offres
 import mailer
 import store as storemod
 from cv_generator import generer_cv_pdf
@@ -1018,6 +1019,56 @@ GRAPHES_ENTREPRISES = {
     "scatter_note_avis": graphes.fig_scatter_note_avis,
     "bubble_categories": graphes.fig_bubble_categories,
 }
+@app.route("/offres-actuelles")
+def page_offres_actuelles():
+    q = request.args.get("q", "").strip().lower()
+    ville = request.args.get("ville", "").strip()
+    categorie = request.args.get("categorie", "").strip()
+    toutes = db.live_all()
+
+    villes = sorted({o.get("ville") for o in toutes if o.get("ville")})
+    base = toutes
+    if q:
+        base = [o for o in base if q in str(o.get("titre", "")).lower() or q in str(o.get("description", "")).lower()
+                or q in str(o.get("entreprise", "")).lower()]
+    if ville:
+        base = [o for o in base if o.get("ville") == ville]
+    compteurs = {}
+    for o in base:
+        compteurs[o.get("categorie", "autre")] = compteurs.get(o.get("categorie", "autre"), 0) + 1
+    offres = [o for o in base if o.get("categorie", "autre") == categorie] if categorie in live_offres.CATEGORIES else base
+
+    aujourd_hui = date.today()
+    for o in offres:
+        try:
+            o["age"] = (aujourd_hui - date.fromisoformat(o["date_publication"])).days
+        except (TypeError, ValueError, KeyError):
+            o["age"] = None
+    return render_template(
+        "offres_actuelles.html", offres=offres[:200], total=len(offres), q=q, ville=ville, villes=villes,
+        categorie=categorie, categories=live_offres.CATEGORIES, compteurs=compteurs, nb_total=len(base),
+        derniere=(db.live_last_refresh() or "")[:16].replace("T", " "), vide=not toutes,
+    )
+
+
+@app.route("/offres-actuelles/actualiser", methods=["POST"])
+def offres_actuelles_actualiser():
+    try:
+        res = live_offres.refresh(db)
+    except Exception:
+        app.logger.exception("Actualisation des offres actuelles")
+        res = {"status": "error", "errors": []}
+    if res["status"] == "ok":
+        flash(t("live_updated", n=res["new"], total=res["total"]), "success")
+    elif res["status"] == "cooldown":
+        flash(t("live_cooldown", min=max(1, -(-res["wait"] // 60))), "info")
+    else:
+        flash(t("live_error"), "danger")
+        for e in res.get("errors", []):
+            app.logger.warning("offres actuelles : %s", e)
+    return redirect(url_for("page_offres_actuelles"))
+
+
 @app.route("/a-propos")
 def page_about():
     return render_template("a_propos.html")
