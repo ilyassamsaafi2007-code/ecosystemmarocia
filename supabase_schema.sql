@@ -59,3 +59,11 @@ create table if not exists app_offres_live (
 );
 create index if not exists app_offres_live_published_idx on app_offres_live (published desc);
 alter table app_offres_live  enable row level security;
+
+-- Formations : certificats délivrés (vérifiables publiquement par leur identifiant)
+create table if not exists app_certificats (
+    cert_id    text primary key,
+    data       jsonb not null,
+    created_at timestamptz not null default now()
+);
+alter table app_certificats enable row level security;
