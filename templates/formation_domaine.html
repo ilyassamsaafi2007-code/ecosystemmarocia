@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ d.titre }}{% endblock %}
+{% block content %}
+<section class="hero">
+    <span class="eyebrow"><a href="{{ url_for('page_formations') }}" class="fm-back"><i class="fa-solid fa-arrow-left arrow"></i> {{ t('fm_title') }}</a></span>
+    <h1 dir="auto">{{ d.titre }}</h1>
+    <p class="lead" dir="auto">{{ d.description }}</p>
+    <div class="fm-bar fm-bar-big"><span style="width: {{ et.pct }}%"></span></div>
+    <div class="fm-bar-txt">{{ t('fm_progress', done=et.valides, total=et.total) }}</div>
+</section>
+
+<section class="fm-steps">
+    {% set ns = namespace(phase='') %}
+    {% for x in et.modules %}
+        {% if x.m.phase != ns.phase %}{% set ns.phase = x.m.phase %}
+        <h2 class="fm-phase">{{ t('fm_phase_tech') if x.m.phase == 'tech' else t('fm_phase_soft') }}</h2>
+        {% endif %}
+        <div class="fm-step {{ 'done' if x.valide else ('open' if x.debloque else 'locked') }}">
+            <span class="fm-step-ic"><i class="fa-solid {{ 'fa-circle-check' if x.valide else ('fa-circle-play' if x.debloque else 'fa-lock') }}"></i></span>
+            <div class="fm-step-body">
+                <b dir="auto">{{ x.m.titre }}</b>
+                <small>{% if x.valide %}{{ t('fm_score', s=x.score) }}{% elif not x.debloque %}{{ t('fm_locked') }}{% else %}{{ x.m.duree or '' }}{% endif %}</small>
+            </div>
+            {% if x.debloque %}<a class="btn {{ 'btn-outline' if x.valide else 'btn-primary' }} btn-sm" href="{{ url_for('page_module', did=d.id, mid=x.m.id) }}">{{ t('fm_review') if x.valide else t('fm_open') }}</a>{% endif %}
+        </div>
+    {% endfor %}
+</section>
+
+<section class="fm-cert">
+    <h2><i class="fa-solid fa-award"></i> {{ t('fm_cert_title') }}</h2>
+    {% if et.certificat %}
+        <a class="btn btn-primary" href="{{ url_for('certificat_public', cert_id=et.certificat) }}"><i class="fa-solid fa-award"></i> {{ t('fm_certificate_view') }}</a>
+    {% elif et.complet %}
+        <p>{{ t('fm_cert_ready') }}</p>
+        <form method="post" action="{{ url_for('formation_certificat', did=d.id) }}" class="fm-cert-form">{{ csrf_input() }}
+            <input type="text" name="nom" value="{{ nom_defaut }}" minlength="3" maxlength="60" required placeholder="{{ t('fm_cert_name') }}" dir="auto">
+            <button class="btn btn-primary" type="submit">{{ t('fm_cert_generate') }}</button>
+        </form>
+    {% else %}
+        <p class="fm-cert-locked"><i class="fa-solid fa-lock"></i> {{ t('fm_cert_locked') }}</p>
+    {% endif %}
+</section>
+{% endblock %}

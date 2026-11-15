@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ t('fm_title') }}{% endblock %}
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">{{ t('fm_eyebrow') }}</span>
+    <h1>{{ t('fm_title') }}</h1>
+    <p class="lead">{{ t('fm_lead') }}</p>
+</section>
+<div class="cards">
+    {% for c in cartes %}{% set d = c.d %}{% set et = c.et %}
+    <article class="card fm-card">
+        <div class="fm-icon"><i class="fa-solid {{ d.icone or 'fa-graduation-cap' }}"></i></div>
+        <h2 class="fm-title" dir="auto">{{ d.titre }}</h2>
+        <p class="excerpt" dir="auto">{{ d.description }}</p>
+        <div class="tags"><span class="tag"><i class="fa-solid fa-list-check"></i> {{ t('fm_modules', n=et.total) }}</span>
+            {% if et.certificat %}<span class="tag tag-cat"><i class="fa-solid fa-award"></i> {{ t('fm_cert_title') }}</span>{% endif %}</div>
+        <div class="fm-bar"><span style="width: {{ et.pct }}%"></span></div>
+        <div class="fm-bar-txt">{{ t('fm_progress', done=et.valides, total=et.total) }}</div>
+        <div class="actions">
+            <a class="btn btn-primary btn-sm" href="{{ url_for('page_formation', did=d.id) }}">
+                {% if et.certificat %}{{ t('fm_review') }}{% elif et.valides %}{{ t('fm_continue') }}{% else %}{{ t('fm_start') }}{% endif %}
+                <i class="fa-solid fa-arrow-right arrow"></i></a>
+        </div>
+    </article>
+    {% else %}
+    <p class="empty">{{ t('fm_empty') }}</p>
+    {% endfor %}
+</div>
+{% endblock %}

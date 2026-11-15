@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ item.m.titre }}{% endblock %}
+{% block content %}
+<section class="hero">
+    <span class="eyebrow"><a href="{{ url_for('page_formation', did=d.id) }}" class="fm-back"><i class="fa-solid fa-arrow-left arrow"></i> {{ d.titre }}</a></span>
+    <h1 dir="auto">{{ item.m.titre }}</h1>
+    <p class="lead">{{ t('fm_phase_tech') if item.m.phase == 'tech' else t('fm_phase_soft') }}</p>
+</section>
+
+<div class="fm-video">
+    <iframe src="https://www.youtube-nocookie.com/embed/{{ item.m.video_id }}?rel=0" title="{{ item.m.titre }}" loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
+<p><a class="btn btn-ghost btn-sm" href="https://www.youtube.com/watch?v={{ item.m.video_id }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i> {{ t('fm_watch_on_yt') }}</a></p>
+
+<section class="fm-quiz">
+    <h2>{{ t('fm_test_title') }}</h2>
+    <p class="hint">{{ t('fm_test_hint', p=note_mini) }}</p>
+    {% if resultat %}
+    <div class="flash flash-danger">{{ t('fm_failed', s=resultat.score, p=note_mini) }}</div>
+    {% endif %}
+    <form method="post" action="{{ url_for('module_test', did=d.id, mid=item.m.id) }}" id="fm-form">{{ csrf_input() }}
+        {% for q in item.m.quiz %}{% set i = loop.index0 %}
+        <fieldset class="fm-q {% if resultat %}{{ 'ok' if resultat.detail[i].ok else 'ko' }}{% endif %}">
+            <legend dir="auto">{{ loop.index }}. {{ q.question }}</legend>
+            {% for o in q.options %}
+            <label class="fm-opt"><input type="radio" name="q{{ i }}" value="{{ loop.index0 }}" required {{ 'checked' if resultat and resultat.detail[i].choix == loop.index0 }}> <span dir="auto">{{ o }}</span></label>
+            {% endfor %}
+            {% if resultat %}<div class="fm-fb">{% if resultat.detail[i].ok %}<i class="fa-solid fa-check"></i> {{ t('fm_correct') }}{% else %}<i class="fa-solid fa-xmark"></i> {{ t('fm_wrong') }}{% endif %}
+                {% if resultat.detail[i].explication %} — {{ resultat.detail[i].explication }}{% endif %}</div>{% endif %}
+        </fieldset>
+        {% endfor %}
+        <button class="btn btn-primary" type="submit" id="fm-submit" data-wait="{{ attente }}" data-label="{{ t('fm_submit') }}" data-wait-label="{{ t('fm_wait', s='__S__') }}">{{ t('fm_submit') }}</button>
+    </form>
+</section>
+<script>
+(function () {
+    var b = document.getElementById('fm-submit'), left = parseInt(b.dataset.wait, 10) || 0;
+    if (!left) return;
+    b.disabled = true;
+    (function tick() {
+        if (left <= 0) { b.disabled = false; b.textContent = b.dataset.label; return; }
+        b.textContent = b.dataset.waitLabel.replace('__S__', left); left--; setTimeout(tick, 1000);
+    })();
+})();
+</script>
+{% endblock %}
