@@ -1,0 +1,321 @@
+{
+  "_aide": "Pour ajouter une vidéo : colle le lien YouTube (ou l'identifiant) dans « video ». Un module sans vidéo est caché. « reponse » = numéro de la bonne option (0 = la première). Vérifie avec : python formations.py",
+  "domaines": [
+    {
+      "id": "cyber",
+      "titre": "Cybersécurité",
+      "icone": "fa-shield-halved",
+      "description": "Comprendre les menaces, les attaques courantes et les bons réflexes pour protéger les données et les systèmes.",
+      "modules": [
+        {
+          "id": "cyber-1",
+          "titre": "Cybersécurité : les bases pour démarrer",
+          "duree": "vidéo YouTube",
+          "video": "https://youtu.be/9HOpanT0GRs?si=eIb5wCC1un0NZp6c",
+          "quiz": [
+            {
+              "question": "Que représente la triade C-I-D (ou CIA) en sécurité de l'information ?",
+              "options": [
+                "Confidentialité, Intégrité, Disponibilité",
+                "Contrôle, Identification, Détection",
+                "Chiffrement, Internet, Données",
+                "Connexion, Isolation, Défense"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Qu'est-ce que le phishing (hameçonnage) ?",
+              "options": [
+                "Une technique qui trompe l'utilisateur avec de faux messages ou sites pour voler ses informations",
+                "Un antivirus gratuit",
+                "Une méthode de sauvegarde des données",
+                "Un type de pare-feu"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "À quoi sert l'authentification multifacteur (MFA) ?",
+              "options": [
+                "À ajouter une seconde preuve d'identité en plus du mot de passe",
+                "À remplacer définitivement le mot de passe par le nom d'utilisateur",
+                "À accélérer la connexion à Internet",
+                "À chiffrer le disque dur"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Quel mot de passe est le plus sûr ?",
+              "options": [
+                "123456",
+                "motdepasse2024",
+                "Une phrase de passe longue, unique pour chaque compte",
+                "Ton prénom suivi de ta date de naissance"
+              ],
+              "reponse": 2
+            },
+            {
+              "question": "Pourquoi faut-il installer régulièrement les mises à jour ?",
+              "options": [
+                "Elles corrigent des failles de sécurité connues",
+                "Elles ralentissent les attaquants en changeant ton adresse IP",
+                "Elles servent uniquement à changer l'apparence",
+                "Elles ne servent à rien pour la sécurité"
+              ],
+              "reponse": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web",
+      "titre": "Développement web",
+      "icone": "fa-code",
+      "description": "Apprendre à construire des sites web : HTML, CSS, JavaScript et les bonnes pratiques.",
+      "modules": [
+        {
+          "id": "web-1",
+          "titre": "HTML, CSS et JavaScript : les bases",
+          "duree": "vidéo YouTube",
+          "video": "https://youtu.be/kAiX0itnonM?si=tkmi4r5-NFjZFCJt",
+          "quiz": [
+            {
+              "question": "Que signifie HTML ?",
+              "options": [
+                "HyperText Markup Language",
+                "High Tech Modern Language",
+                "Hyper Transfer Mode Link",
+                "Home Tool Markup Language"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Quel langage sert à mettre en forme une page (couleurs, marges, polices) ?",
+              "options": [
+                "CSS",
+                "SQL",
+                "Python",
+                "XML"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Quelle balise HTML crée un lien hypertexte ?",
+              "options": [
+                "<a>",
+                "<p>",
+                "<img>",
+                "<link-text>"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "À quoi servent les media queries en CSS ?",
+              "options": [
+                "À adapter la mise en page à la taille de l'écran (responsive)",
+                "À interroger une base de données",
+                "À envoyer des emails",
+                "À compresser les images"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Quel langage permet d'ajouter de l'interactivité dans le navigateur (réagir aux clics, etc.) ?",
+              "options": [
+                "JavaScript",
+                "CSS",
+                "HTML",
+                "Markdown"
+              ],
+              "reponse": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data-ia",
+      "titre": "Data & Intelligence artificielle",
+      "icone": "fa-brain",
+      "description": "Découvrir Python pour les données, l'analyse et les premiers concepts du machine learning.",
+      "modules": [
+        {
+          "id": "data-1",
+          "titre": "Python et données : les bases",
+          "duree": "vidéo YouTube",
+          "video": "https://youtu.be/5NgNicANyqM?si=LRJT95MV0aaqAFSJ",
+          "quiz": [
+            {
+              "question": "Quelle bibliothèque Python est la plus utilisée pour manipuler des tableaux de données (DataFrame) ?",
+              "options": [
+                "pandas",
+                "pygame",
+                "flask",
+                "requests"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Dans l'apprentissage supervisé, le modèle apprend à partir de :",
+              "options": [
+                "Données étiquetées (la bonne réponse est connue)",
+                "Données sans aucune information",
+                "Uniquement des images",
+                "Un seul exemple"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Qu'est-ce que le surapprentissage (overfitting) ?",
+              "options": [
+                "Le modèle s'adapte trop aux données d'entraînement et généralise mal",
+                "Le modèle est trop simple pour apprendre",
+                "Le modèle apprend trop vite",
+                "Les données sont trop nombreuses"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Pourquoi sépare-t-on les données en jeu d'entraînement et jeu de test ?",
+              "options": [
+                "Pour évaluer le modèle sur des données qu'il n'a jamais vues",
+                "Pour doubler la taille du dataset",
+                "Pour supprimer les doublons",
+                "Pour accélérer l'affichage"
+              ],
+              "reponse": 0
+            },
+            {
+              "question": "Quel graphique montre la distribution d'une variable numérique ?",
+              "options": [
+                "Un histogramme",
+                "Un diagramme circulaire de villes",
+                "Une carte",
+                "Un organigramme"
+              ],
+              "reponse": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "softskills": [
+    {
+      "id": "soft-1",
+      "titre": "Communication efficace",
+      "duree": "vidéo YouTube",
+      "video": "https://youtu.be/HAnw168huqA?si=rvaUVTGYGKst_qnM",
+      "quiz": [
+        {
+          "question": "Qu'est-ce que l'écoute active ?",
+          "options": [
+            "Écouter attentivement et reformuler pour vérifier qu'on a bien compris",
+            "Préparer sa réponse pendant que l'autre parle",
+            "Couper la parole pour gagner du temps",
+            "Écouter uniquement les mots-clés"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "Quelle qualité est essentielle dans un message professionnel ?",
+          "options": [
+            "La clarté et la concision",
+            "La longueur",
+            "Le vocabulaire compliqué",
+            "Les abréviations personnelles"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "Face à une critique, la meilleure attitude est de :",
+          "options": [
+            "Écouter, poser des questions et en tirer des améliorations",
+            "Se justifier immédiatement",
+            "Ignorer la remarque",
+            "Répondre sur le même ton"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "Le langage non verbal (posture, regard, ton) :",
+          "options": [
+            "Influence la façon dont ton message est perçu",
+            "N'a aucune importance",
+            "Compte seulement à l'écrit",
+            "Doit toujours être caché"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "Avant de présenter un projet à un client non technique, il faut :",
+          "options": [
+            "Adapter le vocabulaire à son public",
+            "Utiliser un maximum de termes techniques",
+            "Parler le plus vite possible",
+            "Éviter les exemples"
+          ],
+          "reponse": 0
+        }
+      ]
+    },
+    {
+      "id": "soft-2",
+      "titre": "Gestion du temps et organisation",
+      "duree": "vidéo YouTube",
+      "video": "https://youtu.be/s8tOj43JC-o?si=LcOOEV--CvV8vbL7",
+      "quiz": [
+        {
+          "question": "Dans la matrice d'Eisenhower, une tâche importante ET urgente doit être :",
+          "options": [
+            "Faite en priorité, tout de suite",
+            "Reportée à plus tard",
+            "Déléguée sans suivi",
+            "Supprimée"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "En quoi consiste la technique Pomodoro ?",
+          "options": [
+            "Travailler par blocs de 25 minutes suivis de courtes pauses",
+            "Travailler 8 heures sans pause",
+            "Ne faire qu'une tâche par jour",
+            "Faire des pauses de 2 heures"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "Un objectif SMART est :",
+          "options": [
+            "Spécifique, Mesurable, Atteignable, Réaliste et Temporel",
+            "Simple, Magique, Ambitieux, Rapide, Total",
+            "Seulement ambitieux",
+            "Sans date limite"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "Le multitâche permanent :",
+          "options": [
+            "Réduit généralement la concentration et la qualité du travail",
+            "Double la productivité",
+            "Est recommandé pour apprendre",
+            "N'a aucun effet"
+          ],
+          "reponse": 0
+        },
+        {
+          "question": "Quand on a trop de tâches, la première étape est de :",
+          "options": [
+            "Les lister et les prioriser",
+            "Commencer au hasard",
+            "Tout abandonner",
+            "Attendre la veille de la date limite"
+          ],
+          "reponse": 0
+        }
+      ]
+    }
+  ]
+}
