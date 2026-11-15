@@ -27,6 +27,7 @@ class LocalStore:
         self.users_f = self.base / "users.json"
         self.comments_f = self.base / "commentaires.json"
         self.cands_f = self.base / "candidatures.json"
+        self.certs_f = self.base / "certificats.json"
         self.live_f = self.base / "offres_actuelles.json"
         self.apikeys_f = self.base / "api_keys.json"
         self.kyc_dir = self.base / "kyc"
@@ -125,6 +126,15 @@ class LocalStore:
         if len(garde) != len(stock):
             data["offres"] = garde
             self._write(self.live_f, data)
+
+    # -- certificats : {cert_id: {...}}
+    def cert_put(self, cert_id, data):
+        stock = self._read(self.certs_f)
+        stock[cert_id] = data
+        self._write(self.certs_f, stock)
+
+    def cert_get(self, cert_id):
+        return self._read(self.certs_f).get(cert_id)
 
     # -- photos d'identité
     def kyc_put(self, uid, kind, data):
@@ -252,6 +262,15 @@ class SupabaseStore:
 
     def live_purge(self, avant_iso):
         self._rest("DELETE", "app_offres_live", {"published": f"lt.{avant_iso}"}, prefer="return=minimal")
+
+    # -- certificats (table app_certificats)
+    def cert_put(self, cert_id, data):
+        self._rest("POST", "app_certificats", {"on_conflict": "cert_id"}, {"cert_id": cert_id, "data": data},
+                   prefer="resolution=merge-duplicates,return=minimal")
+
+    def cert_get(self, cert_id):
+        rows = self._rest("GET", "app_certificats", {"cert_id": f"eq.{cert_id}", "select": "data"}).json()
+        return rows[0]["data"] if rows else None
 
     # -- photos d'identité (bucket privé)
     def _obj(self, uid, kind):
