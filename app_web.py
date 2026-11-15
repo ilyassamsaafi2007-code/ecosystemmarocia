@@ -40,6 +40,7 @@ from flask import (Flask, Response, abort, flash, g, jsonify, make_response, red
 from markupsafe import Markup
 
 import chatbot
+import formations as fm
 import graphes
 import i18n
 import live_offres
@@ -177,7 +178,7 @@ def csrf_token():
 
 @app.before_request
 def require_login():
-    public_endpoints = {"login", "signup", "google_login", "google_callback", "static", "set_lang",
+    public_endpoints = {"certificat_public", "login", "signup", "google_login", "google_callback", "static", "set_lang",
                         "api_offres", "api_offre"}   # l'API s'authentifie par clé (en-tête), pas par session
     if request.endpoint and request.endpoint not in public_endpoints and not session.get("user_email"):
         return redirect(url_for("login", next=request.path))
@@ -1019,6 +1020,121 @@ GRAPHES_ENTREPRISES = {
     "scatter_note_avis": graphes.fig_scatter_note_avis,
     "bubble_categories": graphes.fig_bubble_categories,
 }
+# ------------------------------------------------------------ formations ----
+# Contenu : data/formations.json (voir formations.py). Progression : dans l'utilisateur, champ "formations" :
+#   {"modules": {module_id: {"score": n, "date": iso}}, "certificats": {domaine_id: cert_id}}
+
+def _fm_progression(email=None):
+    return _user(email).get("formations") or {}
+
+
+def _fm_charger_module(did, mid):
+    """(catalogue, domaine, module, état du parcours) ou abort(404)."""
+    cat = fm.charger()
+    domaine = fm.trouver_domaine(cat, did)
+    if domaine is None:
+        abort(404)
+    prog = _fm_progression()
+    et = fm.etat(domaine, cat, prog.get("modules"), (prog.get("certificats") or {}).get(did))
+    item = next((x for x in et["modules"] if x["m"]["id"] == mid), None)
+    if item is None:
+        abort(404)
+    return domaine, item, et
+
+
+@app.route("/formations")
+def page_formations():
+    cat = fm.charger()
+    prog = _fm_progression()
+    cartes = [{"d": d, "et": fm.etat(d, cat, prog.get("modules"), (prog.get("certificats") or {}).get(d["id"]))}
+              for d in cat["domaines"]]
+    return render_template("formations.html", cartes=cartes)
+
+
+@app.route("/formations/<did>")
+def page_formation(did):
+    cat = fm.charger()
+    domaine = fm.trouver_domaine(cat, did)
+    if domaine is None:
+        abort(404)
+    prog = _fm_progression()
+    et = fm.etat(domaine, cat, prog.get("modules"), (prog.get("certificats") or {}).get(did))
+    return render_template("formation_domaine.html", d=domaine, et=et, nom_defaut=_user().get("name", ""))
+
+
+@app.route("/formations/<did>/<mid>")
+def page_module(did, mid):
+    domaine, item, et = _fm_charger_module(did, mid)
+    if not item["debloque"]:
+        flash(t("fm_locked_module"), "info")
+        return redirect(url_for("page_formation", did=did))
+    session.setdefault(f"fm_debut_{mid}", time.time())
+    return render_template("formation_module.html", d=domaine, item=item, et=et, resultat=None,
+                           attente=fm.MIN_VISIONNAGE, note_mini=fm.NOTE_MINI)
+
+
+@app.route("/formations/<did>/<mid>/test", methods=["POST"])
+def module_test(did, mid):
+    domaine, item, et = _fm_charger_module(did, mid)
+    if not item["debloque"]:
+        return redirect(url_for("page_formation", did=did))
+    debut = session.get(f"fm_debut_{mid}", time.time())
+    if time.time() - debut < fm.MIN_VISIONNAGE:
+        flash(t("fm_too_early"), "danger")
+        return redirect(url_for("page_module", did=did, mid=mid))
+    score, detail = fm.noter(item["m"], request.form)
+    if score >= fm.NOTE_MINI:
+        email = session["user_email"]
+        prog = dict(_fm_progression())
+        modules = dict(prog.get("modules") or {})
+        ancien = (modules.get(mid) or {}).get("score", 0)
+        modules[mid] = {"score": max(ancien, score), "date": _now_iso()}
+        prog["modules"] = modules
+        _update_user(email, formations=prog)
+        session.pop(f"fm_debut_{mid}", None)
+        flash(t("fm_passed", s=score), "success")
+        return redirect(url_for("page_formation", did=did))
+    return render_template("formation_module.html", d=domaine, item=item, et=et,
+                           resultat={"score": score, "detail": detail}, attente=0, note_mini=fm.NOTE_MINI)
+
+
+@app.route("/formations/<did>/delivrer-certificat", methods=["POST"])
+def formation_certificat(did):
+    cat = fm.charger()
+    domaine = fm.trouver_domaine(cat, did)
+    if domaine is None:
+        abort(404)
+    email = session["user_email"]
+    prog = dict(_fm_progression())
+    certs = dict(prog.get("certificats") or {})
+    if did in certs:
+        return redirect(url_for("certificat_public", cert_id=certs[did]))
+    et = fm.etat(domaine, cat, prog.get("modules"))
+    if not et["complet"]:
+        flash(t("fm_cert_locked"), "info")
+        return redirect(url_for("page_formation", did=did))
+    nom = " ".join(request.form.get("nom", "").split())
+    if not 3 <= len(nom) <= 60:
+        flash(t("fm_cert_name_err"), "danger")
+        return redirect(url_for("page_formation", did=did))
+    cert_id = secrets.token_urlsafe(9)
+    db.cert_put(cert_id, {"id": cert_id, "email": email, "nom": nom, "domaine_id": did,
+                          "domaine": domaine["titre"], "score": et["score_moyen"], "date": _now_iso()[:10]})
+    certs[did] = cert_id
+    prog["certificats"] = certs
+    _update_user(email, formations=prog)
+    return redirect(url_for("certificat_public", cert_id=cert_id))
+
+
+@app.route("/certificat/<cert_id>")
+def certificat_public(cert_id):
+    """Page publique et vérifiable du certificat (partageable : LinkedIn, CV...)."""
+    c = db.cert_get(cert_id)
+    if not c:
+        abort(404)
+    return render_template("certificat.html", c=c, proprietaire=session.get("user_email") == c.get("email"))
+
+
 @app.route("/offres-actuelles")
 def page_offres_actuelles():
     q = request.args.get("q", "").strip().lower()
