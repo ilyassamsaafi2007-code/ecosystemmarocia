@@ -11,10 +11,10 @@
 {% block head %}{% endblock %}
 </head>
 <body class="app-shell">
-<aside class="sidebar">
-    <a href="{{ url_for('page_offres') }}" class="logo"><span class="logo-mark">AI</span><span class="logo-text">{{ t('app_name') }}</span></a>
+<aside class="sidebar" data-guide="sidebar">
+    <a href="{{ url_for('page_offres') }}" class="logo" data-guide="logo"><span class="logo-mark">AI</span><span class="logo-text">{{ t('app_name') }}</span></a>
     <div class="sidebar-caption">{{ t('menu_main') }}</div>
-    <nav>
+    <nav data-guide="navigation">
         <a href="{{ url_for('page_offres') }}" class="{{ 'active' if request.endpoint in ('page_offres','page_offre') }}"><i class="fa-solid fa-briefcase"></i><span>{{ t('nav_offers') }}</span></a>
         <a href="{{ url_for('page_entreprises') }}" class="{{ 'active' if request.endpoint == 'page_entreprises' }}"><i class="fa-solid fa-building"></i><span>{{ t('nav_companies') }}</span></a>
         <a href="{{ url_for('page_dashboard') }}" class="{{ 'active' if request.endpoint == 'page_dashboard' }}"><i class="fa-solid fa-chart-line"></i><span>{{ t('nav_dashboard') }}</span></a>
@@ -27,27 +27,32 @@
         {% if is_admin %}<a href="{{ url_for('admin_verifications') }}" class="{{ 'active' if request.endpoint == 'admin_verifications' }}"><i class="fa-solid fa-user-shield"></i><span>{{ t('nav_admin') }}</span></a>{% endif %}
     </nav>
     <div class="sidebar-bottom">
-        <a class="user-mini" href="{{ url_for('page_profil') }}">
+        <a class="user-mini" href="{{ url_for('page_profil') }}" data-guide="profile">
             <span class="avatar">{{ (session.get('user_name','U')[:1] or 'U')|upper }}</span>
             <span class="user-text"><b>{{ session.get('user_name','') }}</b>
                 <small class="vstate {{ 'ok' if me.fully_verified }}">
                 {% if me.fully_verified %}<i class="fa-solid fa-circle-check"></i> {{ t('verified_profile') }}{% else %}<i class="fa-regular fa-circle"></i> {{ t('unverified_profile') }}{% endif %}</small></span>
         </a>
-        <form method="post" action="{{ url_for('logout') }}">{{ csrf_input() }}<button class="logout-button" type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>{{ t('logout') }}</span></button></form>
+        <form method="post" action="{{ url_for('logout') }}" data-guide="logout">{{ csrf_input() }}<button class="logout-button" type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>{{ t('logout') }}</span></button></form>
     </div>
 </aside>
 <main class="main-area">
-    <div class="topbar">
+    <div class="topbar" data-guide="topbar">
+        <button type="button" class="guide-reopen-btn" onclick="PlatformGuide.start()" aria-label="Ouvrir le guide">
+            <span aria-hidden="true">?</span>
+            <span>Guide</span>
+        </button>
+
         <span class="topbar-label">{{ t('tagline') }}</span>
         <div class="topbar-right">{% include '_lang_switch.html' %}<span class="secure-label"><i class="fa-solid fa-shield-halved"></i> {{ t('secure_space') }}</span></div>
     </div>
-    <div class="container">
+    <div class="container" data-guide="content">
         {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="flash flash-{{ category }}" role="alert">{{ message }}</div>{% endfor %}{% endwith %}
         {% block content %}{% endblock %}
     </div>
     <footer>{{ t('footer') }}</footer>
 </main>
-<button id="chat-toggle" class="chat-toggle" aria-label="{{ t('chat_open') }}"><i class="fa-regular fa-message"></i></button>
+<button id="chat-toggle" class="chat-toggle" data-guide="chat" aria-label="{{ t('chat_open') }}"><i class="fa-regular fa-message"></i></button>
 <div id="chat-box" class="chat-box" hidden>
     <div class="chat-header"><span>{{ t('chat_title') }}</span><button id="chat-close" aria-label="{{ t('close') }}"><i class="fa-solid fa-xmark"></i></button></div>
     <div id="chat-messages" class="chat-messages"></div>
@@ -55,5 +60,9 @@
     <form id="chat-form" class="chat-form" autocomplete="off"><input id="chat-input" type="text" placeholder="{{ t('chat_placeholder') }}" maxlength="300"><button type="submit" aria-label="{{ t('send') }}"><i class="fa-solid fa-arrow-up"></i></button></form>
 </div>
 <script src="{{ url_for('static', filename='chat.js') }}"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='guide.css') }}">
+<script src="{{ url_for('static', filename='guide.js') }}"></script>
+
 </body>
 </html>
